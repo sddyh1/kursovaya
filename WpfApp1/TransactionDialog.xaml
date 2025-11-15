@@ -1,0 +1,87 @@
+﻿<Window x:Class="WpfApp1.TransactionDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
+        Title="Добавить транзакцию" Height="350" Width="450" 
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Описание -->
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Описание:" 
+                   Margin="0,0,10,10" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="0" Grid.Column="1" x:Name="DescTextBox" 
+                 Margin="0,0,0,10" Height="25" VerticalAlignment="Center"/>
+
+        <!-- Сумма -->
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Сумма (₽):" 
+                   Margin="0,0,10,10" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="1" Grid.Column="1" x:Name="AmountTextBox" 
+                 Margin="0,0,0,10" Height="25" VerticalAlignment="Center"/>
+
+        <!-- Тип -->
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Тип:" 
+                   Margin="0,0,10,10" VerticalAlignment="Center"/>
+        <ComboBox Grid.Row="2" Grid.Column="1" x:Name="TypeComboBox" 
+                  Margin="0,0,0,10" Height="25" VerticalAlignment="Center">
+            <ComboBoxItem Content="Income" IsSelected="True"/>
+            <ComboBoxItem Content="Expense"/>
+        </ComboBox>
+
+        <!-- Категория -->
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Категория:" 
+                   Margin="0,0,10,10" VerticalAlignment="Center"/>
+        <ComboBox Grid.Row="3" Grid.Column="1" x:Name="CategoryComboBox" 
+                  Margin="0,0,0,10" Height="25" VerticalAlignment="Center">
+            <ComboBoxItem Content="Salary"/>
+            <ComboBoxItem Content="Freelance"/>
+            <ComboBoxItem Content="Food" IsSelected="True"/>
+            <ComboBoxItem Content="Utilities"/>
+            <ComboBoxItem Content="Transport"/>
+            <ComboBoxItem Content="Entertainment"/>
+            <ComboBoxItem Content="Shopping"/>
+            <ComboBoxItem Content="Healthcare"/>
+        </ComboBox>
+
+        <!-- Дата -->
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Дата:" 
+                   Margin="0,0,10,10" VerticalAlignment="Center"/>
+        <DatePicker Grid.Row="4" Grid.Column="1" x:Name="DatePicker" 
+                    Margin="0,0,0,10" Height="25" VerticalAlignment="Center"
+                    SelectedDate="{x:Static system:DateTime.Today}"/>
+
+        <!-- Время -->
+        <TextBlock Grid.Row="5" Grid.Column="0" Text="Время:" 
+                   Margin="0,0,10,10" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="5" Grid.Column="1" x:Name="TimeTextBox" 
+                 Margin="0,0,0,20" Height="25" VerticalAlignment="Center"
+                 Text="12:00"/>
+
+        <!-- Кнопки -->
+        <StackPanel Grid.Row="7" Grid.ColumnSpan="2" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right"
+                    Margin="0,20,0,0">
+            <Button Content="OK" Click="OkBtn_Click" 
+                    IsDefault="True" Width="80" Margin="0,0,10,0"/>
+            <Button Content="Отмена" Click="CancelBtn_Click" 
+                    IsCancel="True" Width="80"/>
+        </StackPanel>
+    </Grid>
+</Window>
