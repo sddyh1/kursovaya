@@ -12,6 +12,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- Панель управления -->
         <StackPanel Grid.Row="0" Orientation="Horizontal">
             <Button x:Name="AddBtn" Content="➕ Добавить" Click="AddBtn_Click" Padding="10,5" Margin="5"/>
             <Button x:Name="EditBtn" Content="✏️ Редактировать" Click="EditBtn_Click" Padding="10,5" Margin="5"/>
@@ -21,24 +22,28 @@
                     Padding="10,5" Margin="5" Width="80"/>
         </StackPanel>
 
+        <!-- Панель пользователя и поиск -->
         <Grid Grid.Row="1" Margin="0,10,0,5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
+            <!-- Поиск -->
             <StackPanel Grid.Column="0" Orientation="Horizontal">
                 <TextBlock Text="Поиск:" VerticalAlignment="Center" Margin="0,0,10,0"/>
                 <TextBox x:Name="SearchTextBox" Width="200" Height="25" 
                          TextChanged="SearchTextBox_TextChanged"/>
-        </StackPanel>
+            </StackPanel>
 
+            <!-- Информация о пользователе -->
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock Text="Пользователь:" VerticalAlignment="Center" Margin="0,0,5,0"/>
                 <TextBlock x:Name="CurrentUserText" FontWeight="Bold" VerticalAlignment="Center"/>
             </StackPanel>
         </Grid>
 
+        <!-- Таблица транзакций -->
         <DataGrid x:Name="TransactionsGrid" Grid.Row="2" Margin="0,10" 
                   AutoGenerateColumns="False" IsReadOnly="True"
                   SelectionMode="Single">
@@ -52,6 +57,7 @@
             </DataGrid.Columns>
         </DataGrid>
 
+        <!-- Статистика -->
         <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,10,0,0">
             <TextBlock x:Name="StatsText" FontWeight="Bold" Margin="0,0,20,0"/>
             <TextBlock x:Name="IncomeText" Foreground="Green" Margin="0,0,20,0"/>

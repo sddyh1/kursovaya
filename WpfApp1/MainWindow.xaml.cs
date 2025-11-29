@@ -1,222 +1,160 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.Data.SQLite;
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using WpfApp1.Models;
+using WpfApp1.Repositories;
+using WpfApp1.Views;
 
 namespace WpfApp1
 {
     public partial class MainWindow : Window
     {
-        private ObservableCollection<Transaction> transactions;
-        private string connectionString = "Data Source=finance.db;Version=3;";
+        private readonly ITransactionRepository _transactionRepository;
+        private readonly User _currentUser;
+        private List<Transaction> _allTransactions;
 
-        public MainWindow()
+        public MainWindow(User user)
         {
-            transactions = new ObservableCollection<Transaction>();
             InitializeComponent();
-            InitializeDatabase();
-            LoadTransactions();
+            _currentUser = user;
+            _transactionRepository = new TransactionRepository("Data Source=finance.db;Version=3;");
+
+            // Подписываемся на событие изменения данных
+            _transactionRepository.DataChanged += async (s, e) => await LoadTransactionsAsync();
+
+            InitializeUI();
+            LoadTransactionsAsync();
         }
 
-        private void InitializeDatabase()
+        private void InitializeUI()
+        {
+            CurrentUserText.Text = _currentUser.Username;
+            Title = $"Finance Manager - {_currentUser.Username}";
+        }
+
+        private async System.Threading.Tasks.Task LoadTransactionsAsync()
         {
             try
             {
-                if (!File.Exists("finance.db"))
-                {
-                    SQLiteConnection.CreateFile("finance.db");
-
-                    using (var connection = new SQLiteConnection(connectionString))
-                    {
-                        connection.Open();
-                        var command = new SQLiteCommand(@"
-                            CREATE TABLE IF NOT EXISTS Transactions (
-                                TransactionId INTEGER PRIMARY KEY AUTOINCREMENT,
-                                Description TEXT NOT NULL,
-                                Amount DECIMAL(10,2) NOT NULL,
-                                Type TEXT NOT NULL,
-                                CategoryName TEXT NOT NULL,
-                                TransactionDate DATETIME NOT NULL
-                            )", connection);
-                        command.ExecuteNonQuery();
-
-                        command.CommandText = @"
-                            INSERT INTO Transactions (Description, Amount, Type, CategoryName, TransactionDate) VALUES
-                            ('Зарплата', 50000.00, 'Income', 'Salary', datetime('now', '-7 days')),
-                            ('Продукты', -3500.50, 'Expense', 'Food', datetime('now', '-6 days')),
-                            ('Коммунальные услуги', -2500.00, 'Expense', 'Utilities', datetime('now', '-5 days')),
-                            ('Фриланс', 15000.00, 'Income', 'Freelance', datetime('now', '-4 days'))";
-                        command.ExecuteNonQuery();
-                    }
-                }
+                _allTransactions = (await _transactionRepository.GetByUserIdAsync(_currentUser.UserId)).ToList();
+                TransactionsGrid.ItemsSource = _allTransactions;
+                UpdateStatistics();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка инициализации базы данных: {ex.Message}");
-            }
-
-        private void LoadTransactions()
-        {
-            try
-            {
-                transactions.Clear();
-
-                using (var connection = new SQLiteConnection(connectionString))
-                {
-                    connection.Open();
-                    var command = new SQLiteCommand(
-                        "SELECT * FROM Transactions ORDER BY TransactionDate DESC",
-                        connection);
-
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            transactions.Add(new Transaction
-                            {
-                                TransactionId = reader.GetInt32(0),
-                                Description = reader.GetString(1),
-                                Amount = reader.GetDecimal(2),
-                                Type = reader.GetString(3),
-                                CategoryName = reader.GetString(4),
-                                TransactionDate = reader.GetDateTime(5)
-                            });
-                        }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка загрузки данных: {ex.Message}");
+                MessageBox.Show($"Ошибка загрузки данных: {ex.Message}", "Ошибка",
+                              MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void UpdateStats()
+        private void UpdateStatistics()
         {
-            try
-            {
-                decimal income = 0, expense = 0;
+            if (_allTransactions == null) return;
 
-                foreach (var transaction in transactions)
-                {
-                    if (transaction.Type == "Income")
-                        income += transaction.Amount;
-                    else
-                        expense += transaction.Amount;
-                }
+            var totalIncome = _allTransactions.Where(t => t.Type == "Income").Sum(t => t.Amount);
+            var totalExpenses = _allTransactions.Where(t => t.Type == "Expense").Sum(t => t.Amount);
+            var balance = totalIncome + totalExpenses; // Expenses уже отрицательные
 
-                var balance = income + expense;
+            StatsText.Text = $"Баланс: {balance:N2} ₽";
+            IncomeText.Text = $"Доходы: {totalIncome:N2} ₽";
+            ExpenseText.Text = $"Расходы: {Math.Abs(totalExpenses):N2} ₽";
+        }
 
-                StatsText.Text = $"Доходы: {income:N2} ₽ | Расходы: {expense:N2} ₽ | Баланс: {balance:N2} ₽";
-            }
-
-        private void AddBtn_Click(object sender, RoutedEventArgs e)
+        private async void AddBtn_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new TransactionDialog();
             if (dialog.ShowDialog() == true)
             {
+                var transaction = new Transaction
+                {
+                    Description = dialog.Description,
+                    Amount = dialog.Amount,
+                    Type = dialog.Type,
+                    CategoryName = dialog.Category,
+                    TransactionDate = dialog.TransactionDate,
+                    UserId = _currentUser.UserId
+                };
+
                 try
                 {
-                    using (var connection = new SQLiteConnection(connectionString))
-                    {
-                        connection.Open();
-                        var command = new SQLiteCommand(@"
-                            INSERT INTO Transactions (Description, Amount, Type, CategoryName, TransactionDate)
-                            VALUES (@desc, @amount, @type, @category, @date)", connection);
-
-                        command.Parameters.AddWithValue("@desc", dialog.Description);
-                        command.Parameters.AddWithValue("@amount", dialog.Amount);
-                        command.Parameters.AddWithValue("@type", dialog.Type);
-                        command.Parameters.AddWithValue("@category", dialog.Category);
-                        command.Parameters.AddWithValue("@date", dialog.TransactionDate);
-
-                        command.ExecuteNonQuery();
-                    }
-                    LoadTransactions();
+                    await _transactionRepository.AddAsync(transaction);
+                    // Данные автоматически обновятся благодаря событию DataChanged
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка добавления: {ex.Message}");
+                    MessageBox.Show($"Ошибка добавления транзакции: {ex.Message}", "Ошибка",
+                                  MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
 
-        private void EditBtn_Click(object sender, RoutedEventArgs e)
+        private async void EditBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (TransactionsGrid.SelectedItem is Transaction selected)
+            if (TransactionsGrid.SelectedItem is Transaction selectedTransaction)
             {
-                var dialog = new TransactionDialog(selected);
+                var dialog = new TransactionDialog(selectedTransaction);
                 if (dialog.ShowDialog() == true)
                 {
+                    selectedTransaction.Description = dialog.Description;
+                    selectedTransaction.Amount = dialog.Amount;
+                    selectedTransaction.Type = dialog.Type;
+                    selectedTransaction.CategoryName = dialog.Category;
+                    selectedTransaction.TransactionDate = dialog.TransactionDate;
+
                     try
                     {
-                        using (var connection = new SQLiteConnection(connectionString))
-                        {
-                            connection.Open();
-                            var command = new SQLiteCommand(@"
-                                UPDATE Transactions 
-                                SET Description = @desc, Amount = @amount, Type = @type, 
-                                    CategoryName = @category, TransactionDate = @date
-                                WHERE TransactionId = @id", connection);
-
-                            command.Parameters.AddWithValue("@desc", dialog.Description);
-                            command.Parameters.AddWithValue("@amount", dialog.Amount);
-                            command.Parameters.AddWithValue("@type", dialog.Type);
-                            command.Parameters.AddWithValue("@category", dialog.Category);
-                            command.Parameters.AddWithValue("@date", dialog.TransactionDate);
-                            command.Parameters.AddWithValue("@id", selected.TransactionId);
-
-                            command.ExecuteNonQuery();
-                        }
-                        LoadTransactions();
+                        await _transactionRepository.UpdateAsync(selectedTransaction);
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Ошибка редактирования: {ex.Message}");
+                        MessageBox.Show($"Ошибка редактирования транзакции: {ex.Message}", "Ошибка",
+                                      MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
             }
             else
             {
-                MessageBox.Show("Выберите транзакцию для редактирования");
+                MessageBox.Show("Выберите транзакцию для редактирования", "Информация",
+                              MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
         private async void DeleteBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (TransactionsGrid.SelectedItem is Transaction selected)
+            if (TransactionsGrid.SelectedItem is Transaction selectedTransaction)
             {
-                var result = MessageBox.Show(
-                    $"Удалить транзакцию '{selected.Description}'?",
-                    "Подтверждение удаления",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
+                var result = MessageBox.Show($"Удалить транзакцию '{selectedTransaction.Description}'?",
+                                           "Подтверждение удаления",
+                                           MessageBoxButton.YesNo, MessageBoxImage.Question);
 
                 if (result == MessageBoxResult.Yes)
                 {
                     try
                     {
-                        using (var connection = new SQLiteConnection(connectionString))
-                        {
-                            connection.Open();
-                            var command = new SQLiteCommand(
-                                "DELETE FROM Transactions WHERE TransactionId = @id",
-                                connection);
-                            command.Parameters.AddWithValue("@id", selected.TransactionId);
-                            command.ExecuteNonQuery();
-                        }
+                        await _transactionRepository.DeleteAsync(selectedTransaction.TransactionId);
                     }
                     catch (Exception ex)
                     {
+                        MessageBox.Show($"Ошибка удаления транзакции: {ex.Message}", "Ошибка",
+                                      MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+            else
+            {
                 MessageBox.Show("Выберите транзакцию для удаления", "Информация",
                               MessageBoxButton.OK, MessageBoxImage.Information);
             }
-                    }
+        }
 
         private async void RefreshBtn_Click(object sender, RoutedEventArgs e)
         {
             await LoadTransactionsAsync();
             MessageBox.Show("Данные обновлены", "Информация",
                           MessageBoxButton.OK, MessageBoxImage.Information);
-                }
+        }
 
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -245,16 +183,20 @@ namespace WpfApp1
 
             if (result == MessageBoxResult.Yes)
             {
+                // Открываем окно входа
                 var loginWindow = new LoginWindow();
                 loginWindow.Show();
+
+                // Закрываем текущее окно
                 this.Close();
             }
         }
 
         protected override void OnClosed(EventArgs e)
         {
+            // Отписываемся от событий при закрытии окна
             if (_transactionRepository != null)
-        {
+            {
                 _transactionRepository.DataChanged -= async (s, ev) => await LoadTransactionsAsync();
             }
             base.OnClosed(e);
