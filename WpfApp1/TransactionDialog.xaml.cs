@@ -25,7 +25,6 @@ namespace WpfApp1
             DescTextBox.Text = transaction.Description;
             AmountTextBox.Text = Math.Abs(transaction.Amount).ToString("F2");
 
-            // Устанавливаем тип
             foreach (ComboBoxItem item in TypeComboBox.Items)
             {
                 if (item.Content.ToString() == transaction.Type)
@@ -35,7 +34,6 @@ namespace WpfApp1
                 }
             }
 
-            // Устанавливаем категорию
             foreach (ComboBoxItem item in CategoryComboBox.Items)
             {
                 if (item.Content.ToString() == transaction.CategoryName)
@@ -68,7 +66,6 @@ namespace WpfApp1
                 return;
             }
 
-            // Проверяем дату
             if (DatePicker.SelectedDate == null)
             {
                 MessageBox.Show("Выберите дату", "Ошибка",
@@ -77,7 +74,6 @@ namespace WpfApp1
                 return;
             }
 
-            // Проверяем время
             if (!DateTime.TryParse(TimeTextBox.Text, out DateTime time))
             {
                 MessageBox.Show("Введите корректное время (формат: HH:mm)", "Ошибка",
@@ -87,7 +83,6 @@ namespace WpfApp1
                 return;
             }
 
-            // Объединяем дату и время
             TransactionDate = DatePicker.SelectedDate.Value.Date + time.TimeOfDay;
 
             Amount = Type == "Expense" ? -amount : amount;

@@ -41,7 +41,6 @@ namespace WpfApp1
                             )", connection);
                         command.ExecuteNonQuery();
 
-                        // Добавляем тестовые данные с явным указанием даты
                         command.CommandText = @"
                             INSERT INTO Transactions (Description, Amount, Type, CategoryName, TransactionDate) VALUES
                             ('Зарплата', 50000.00, 'Income', 'Salary', datetime('now', '-7 days')),
@@ -56,7 +55,6 @@ namespace WpfApp1
             {
                 MessageBox.Show($"Ошибка инициализации базы данных: {ex.Message}");
             }
-        }
 
         private void LoadTransactions()
         {
@@ -85,12 +83,6 @@ namespace WpfApp1
                                 TransactionDate = reader.GetDateTime(5)
                             });
                         }
-                    }
-                }
-
-                TransactionsGrid.ItemsSource = transactions;
-                UpdateStats();
-            }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка загрузки данных: {ex.Message}");
@@ -113,14 +105,8 @@ namespace WpfApp1
 
                 var balance = income + expense;
 
-                // Форматируем в рубли
                 StatsText.Text = $"Доходы: {income:N2} ₽ | Расходы: {expense:N2} ₽ | Баланс: {balance:N2} ₽";
             }
-            catch (Exception ex)
-            {
-                StatsText.Text = "Ошибка расчета статистики";
-            }
-        }
 
         private void AddBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -194,7 +180,7 @@ namespace WpfApp1
             }
         }
 
-        private void DeleteBtn_Click(object sender, RoutedEventArgs e)
+        private async void DeleteBtn_Click(object sender, RoutedEventArgs e)
         {
             if (TransactionsGrid.SelectedItem is Transaction selected)
             {
@@ -217,23 +203,61 @@ namespace WpfApp1
                             command.Parameters.AddWithValue("@id", selected.TransactionId);
                             command.ExecuteNonQuery();
                         }
-                        LoadTransactions();
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Ошибка удаления: {ex.Message}");
+                MessageBox.Show("Выберите транзакцию для удаления", "Информация",
+                              MessageBoxButton.OK, MessageBoxImage.Information);
+            }
                     }
+
+        private async void RefreshBtn_Click(object sender, RoutedEventArgs e)
+        {
+            await LoadTransactionsAsync();
+            MessageBox.Show("Данные обновлены", "Информация",
+                          MessageBoxButton.OK, MessageBoxImage.Information);
                 }
+
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_allTransactions == null) return;
+
+            var searchText = SearchTextBox.Text.ToLower();
+            if (string.IsNullOrWhiteSpace(searchText))
+            {
+                TransactionsGrid.ItemsSource = _allTransactions;
             }
             else
             {
-                MessageBox.Show("Выберите транзакцию для удаления");
+                var filtered = _allTransactions.Where(t =>
+                    t.Description.ToLower().Contains(searchText) ||
+                    t.CategoryName.ToLower().Contains(searchText) ||
+                    t.Type.ToLower().Contains(searchText)
+                ).ToList();
+                TransactionsGrid.ItemsSource = filtered;
             }
         }
 
-        private void RefreshBtn_Click(object sender, RoutedEventArgs e)
+        private void LogoutButton_Click(object sender, RoutedEventArgs e)
         {
-            LoadTransactions();
+            var result = MessageBox.Show("Вы уверены, что хотите выйти?", "Подтверждение выхода",
+                                       MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                var loginWindow = new LoginWindow();
+                loginWindow.Show();
+                this.Close();
+            }
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            if (_transactionRepository != null)
+        {
+                _transactionRepository.DataChanged -= async (s, ev) => await LoadTransactionsAsync();
+            }
+            base.OnClosed(e);
         }
     }
 }
