@@ -6,6 +6,172 @@
         ResizeMode="NoResize"
         Background="#F5F5F5">
 
+    <Window.Resources>
+        <Style x:Key="ProjectComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <Border x:Name="border" 
+                                    CornerRadius="10"
+                                    BorderThickness="2"
+                                    BorderBrush="#E8CBAA"
+                                    Background="#F9F9F9">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="30"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <ContentPresenter Grid.Column="0"
+                                                      Content="{TemplateBinding SelectionBoxItem}"
+                                                      Margin="12,0,0,0"
+                                                      VerticalAlignment="Center"
+                                                      HorizontalAlignment="Left"/>
+
+                                    <ToggleButton Grid.Column="1" 
+                                                  x:Name="toggleButton"
+                                                  Background="Transparent"
+                                                  BorderThickness="0"
+                                                  IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                                  ClickMode="Press"
+                                                  Focusable="False">
+                                        <Path Data="M0,0 L4,4 8,0 Z"
+                                              Fill="#888888"
+                                              StrokeThickness="0"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Width="12"
+                                              Height="6"/>
+                                    </ToggleButton>
+                                </Grid>
+                            </Border>
+
+                            <Popup x:Name="PART_Popup" 
+                                   Placement="Bottom"
+                                   IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                                   AllowsTransparency="True"
+                                   PopupAnimation="Slide"
+                                   Focusable="False">
+                                <Border x:Name="dropDownBorder" 
+                                        Background="White"
+                                        BorderBrush="#E8CBAA"
+                                        BorderThickness="2"
+                                        CornerRadius="8"
+                                        MinWidth="{Binding ActualWidth, ElementName=border}">
+                                    <ScrollViewer MaxHeight="200">
+                                        <ItemsPresenter/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#BC6C25"/>
+                            </Trigger>
+                            <Trigger Property="IsDropDownOpen" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#BC6C25"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="ComboBoxItem" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="border" 
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Left" 
+                                              VerticalAlignment="Center"
+                                              Margin="12,0,0,0"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#F9F9F9"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#E8CBAA"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TimeTextBoxStyle" TargetType="TextBox">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,12"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Height" Value="45"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="CaretBrush" Value="#BC6C25"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="border" 
+                                CornerRadius="10"
+                                BorderThickness="2"
+                                BorderBrush="#E8CBAA"
+                                Background="#F9F9F9">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#BC6C25"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DatePickerTextBoxStyle" TargetType="DatePickerTextBox">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,12"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Grid>
+                            <TextBox x:Name="PART_TextBox" 
+                                     Text="{Binding Path=SelectedDate, RelativeSource={RelativeSource AncestorType={x:Type DatePicker}}, StringFormat='dd.MM.yyyy'}"
+                                     BorderThickness="0"
+                                     Padding="12,12"
+                                     Background="Transparent"
+                                     Foreground="#333333"
+                                     VerticalContentAlignment="Center"
+                                     IsReadOnly="False"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
     <Border CornerRadius="20" Margin="30" Background="White"
             BorderThickness="1" BorderBrush="#E0E0E0">
         <Grid>
@@ -20,7 +186,6 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Заголовок -->
             <StackPanel Grid.Row="0" Margin="0,40,0,30">
                 <TextBlock Text="ТРАНЗАКЦИЯ" 
                            HorizontalAlignment="Center"
@@ -33,28 +198,19 @@
                         Margin="0,10,0,0"/>
             </StackPanel>
 
-            <!-- Пользователь -->
+            <!-- Пользователь - ИСПРАВЛЕННЫЙ ComboBox (убрал ItemTemplate) -->
             <StackPanel Grid.Row="1" Margin="50,0,50,15">
                 <TextBlock Text="Пользователь:" 
                            FontSize="14"
                            Foreground="#606C38"
                            Margin="0,0,0,8"/>
-                <Border CornerRadius="10" 
-                        BorderThickness="2"
-                        BorderBrush="#E8CBAA"
-                        Background="#F9F9F9">
-                    <ComboBox x:Name="UserComboBox"
-                              DisplayMemberPath="Username"
-                              SelectedValuePath="UserId"
-                              BorderThickness="0"
-                              Padding="12,10"
-                              FontSize="14"
-                              Background="Transparent"
-                              Foreground="#333333"/>
-                </Border>
+                <ComboBox x:Name="UserComboBox"
+                          SelectedValuePath="UserId"
+                          DisplayMemberPath="Username"
+                          Style="{StaticResource ProjectComboBoxStyle}"
+                          HorizontalAlignment="Stretch"/>
             </StackPanel>
 
-            <!-- Описание -->
             <StackPanel Grid.Row="2" Margin="50,0,50,15">
                 <TextBlock Text="Описание:" 
                            FontSize="14"
@@ -98,7 +254,6 @@
                 </Border>
             </StackPanel>
 
-            <!-- Сумма -->
             <StackPanel Grid.Row="3" Margin="50,0,50,15">
                 <TextBlock Text="Сумма (₽):" 
                            FontSize="14"
@@ -142,7 +297,6 @@
                 </Border>
             </StackPanel>
 
-            <!-- Тип и Категория -->
             <Grid Grid.Row="4" Margin="50,0,50,15">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -150,58 +304,39 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Тип -->
                 <StackPanel Grid.Column="0">
                     <TextBlock Text="Тип:" 
                                FontSize="14"
                                Foreground="#606C38"
                                Margin="0,0,0,8"/>
-                    <Border CornerRadius="10" 
-                            BorderThickness="2"
-                            BorderBrush="#E8CBAA"
-                            Background="#F9F9F9">
-                        <ComboBox x:Name="TypeComboBox"
-                                  BorderThickness="0"
-                                  Padding="12,10"
-                                  FontSize="14"
-                                  Background="Transparent"
-                                  Foreground="#333333">
-                            <ComboBoxItem Content="Доход" IsSelected="True"/>
-                            <ComboBoxItem Content="Расход"/>
-                        </ComboBox>
-                    </Border>
+                    <ComboBox x:Name="TypeComboBox"
+                              Style="{StaticResource ProjectComboBoxStyle}"
+                              HorizontalAlignment="Stretch">
+                        <ComboBoxItem Content="Доход" IsSelected="True"/>
+                        <ComboBoxItem Content="Расход"/>
+                    </ComboBox>
                 </StackPanel>
 
-                <!-- Категория -->
                 <StackPanel Grid.Column="2">
                     <TextBlock Text="Категория:" 
                                FontSize="14"
                                Foreground="#606C38"
                                Margin="0,0,0,8"/>
-                    <Border CornerRadius="10" 
-                            BorderThickness="2"
-                            BorderBrush="#E8CBAA"
-                            Background="#F9F9F9">
-                        <ComboBox x:Name="CategoryComboBox"
-                                  BorderThickness="0"
-                                  Padding="12,10"
-                                  FontSize="14"
-                                  Background="Transparent"
-                                  Foreground="#333333">
-                            <ComboBoxItem Content="Зарплата"/>
-                            <ComboBoxItem Content="Фриланс"/>
-                            <ComboBoxItem Content="Еда" IsSelected="True"/>
-                            <ComboBoxItem Content="Коммуналка"/>
-                            <ComboBoxItem Content="Транспорт"/>
-                            <ComboBoxItem Content="Развлечения"/>
-                            <ComboBoxItem Content="Покупки"/>
-                            <ComboBoxItem Content="Здоровье"/>
-                        </ComboBox>
-                    </Border>
+                    <ComboBox x:Name="CategoryComboBox"
+                              Style="{StaticResource ProjectComboBoxStyle}"
+                              HorizontalAlignment="Stretch">
+                        <ComboBoxItem Content="Зарплата"/>
+                        <ComboBoxItem Content="Фриланс"/>
+                        <ComboBoxItem Content="Еда" IsSelected="True"/>
+                        <ComboBoxItem Content="Коммуналка"/>
+                        <ComboBoxItem Content="Транспорт"/>
+                        <ComboBoxItem Content="Развлечения"/>
+                        <ComboBoxItem Content="Покупки"/>
+                        <ComboBoxItem Content="Здоровье"/>
+                    </ComboBox>
                 </StackPanel>
             </Grid>
 
-            <!-- Дата и Время -->
             <Grid Grid.Row="5" Margin="50,0,50,25">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -209,7 +344,6 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Дата -->
                 <StackPanel Grid.Column="0">
                     <TextBlock Text="Дата:" 
                                FontSize="14"
@@ -218,7 +352,8 @@
                     <Border CornerRadius="10" 
                             BorderThickness="2"
                             BorderBrush="#E8CBAA"
-                            Background="#F9F9F9">
+                            Background="#F9F9F9"
+                            Height="45">
                         <DatePicker x:Name="DatePicker" 
                                     BorderThickness="0"
                                     FontSize="14"
@@ -228,65 +363,24 @@
                                     VerticalContentAlignment="Center"
                                     SelectedDateFormat="Short">
                             <DatePicker.Resources>
-                                <Style TargetType="DatePickerTextBox">
-                                    <Setter Property="Background" Value="Transparent"/>
-                                    <Setter Property="BorderThickness" Value="0"/>
-                                    <Setter Property="Padding" Value="12,12"/>
-                                    <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                    <Setter Property="Foreground" Value="#333333"/>
-                                </Style>
+                                <Style TargetType="DatePickerTextBox" BasedOn="{StaticResource DatePickerTextBoxStyle}"/>
                             </DatePicker.Resources>
                         </DatePicker>
                     </Border>
                 </StackPanel>
 
-                <!-- Время -->
                 <StackPanel Grid.Column="2">
                     <TextBlock Text="Время:" 
                                FontSize="14"
                                Foreground="#606C38"
                                Margin="0,0,0,8"/>
-                    <Border CornerRadius="10" 
-                            BorderThickness="2"
-                            BorderBrush="#E8CBAA"
-                            Background="#F9F9F9">
-                        <TextBox x:Name="TimeTextBox" 
-                                 BorderThickness="0"
-                                 Padding="12,12"
-                                 FontSize="14"
-                                 Background="Transparent"
-                                 Foreground="#333333"
-                                 VerticalContentAlignment="Center"
-                                 CaretBrush="#BC6C25"
-                                 Text="12:00">
-                            <TextBox.Style>
-                                <Style TargetType="TextBox">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="TextBox">
-                                                <Border x:Name="border" 
-                                                        Background="{TemplateBinding Background}"
-                                                        BorderBrush="{TemplateBinding BorderBrush}"
-                                                        BorderThickness="{TemplateBinding BorderThickness}"
-                                                        CornerRadius="10">
-                                                    <ScrollViewer x:Name="PART_ContentHost"/>
-                                                </Border>
-                                                <ControlTemplate.Triggers>
-                                                    <Trigger Property="IsFocused" Value="True">
-                                                        <Setter TargetName="border" Property="BorderBrush" Value="#BC6C25"/>
-                                                    </Trigger>
-                                                </ControlTemplate.Triggers>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </TextBox.Style>
-                        </TextBox>
-                    </Border>
+                    <TextBox x:Name="TimeTextBox" 
+                             Style="{StaticResource TimeTextBoxStyle}"
+                             Text="12:00"
+                             HorizontalAlignment="Stretch"/>
                 </StackPanel>
             </Grid>
 
-            <!-- Кнопки -->
             <StackPanel Grid.Row="7" 
                        Orientation="Horizontal" 
                        HorizontalAlignment="Center" 

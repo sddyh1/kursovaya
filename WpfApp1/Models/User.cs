@@ -55,6 +55,12 @@ namespace WpfApp1.Models
             set { _isActive = value; OnPropertyChanged(nameof(IsActive)); }
         }
 
+        // Добавляем метод ToString() для правильного отображения в ComboBox
+        public override string ToString()
+        {
+            return Username ?? $"User {UserId}";
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         protected virtual void OnPropertyChanged(string propertyName)
