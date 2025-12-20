@@ -53,11 +53,26 @@ namespace WpfApp1
                     TotalUsersText.Text = $"Всего пользователей: {users.Count()}";
                     TotalTransactionsText.Text = $"Всего транзакций: {transactions.Count()}";
 
-                    var totalIncome = transactions.Where(t => t.Type == "Income").Sum(t => t.Amount);
-                    var totalExpenses = transactions.Where(t => t.Type == "Expense").Sum(t => t.Amount);
-                    var totalBalance = totalIncome + totalExpenses;
+                    // Получаем все транзакции (доходы - положительные, расходы - отрицательные)
+                    var allTransactions = transactions.ToList();
+
+                    // Рассчитываем суммы с учетом знака
+                    var totalIncome = allTransactions
+                        .Where(t => t.Type == "Income" || (t.Type == "Доход" && t.Amount > 0))
+                        .Sum(t => t.Amount);
+
+                    var totalExpenses = allTransactions
+                        .Where(t => t.Type == "Expense" || (t.Type == "Расход" && t.Amount < 0))
+                        .Sum(t => t.Amount);
+
+                    // Общий баланс = сумма всех транзакций (доходы положительные, расходы отрицательные)
+                    var totalBalance = allTransactions.Sum(t => t.Amount);
 
                     TotalBalanceText.Text = $"Общий баланс: {totalBalance:N2} ₽";
+
+                    // Для отладки - выводим в консоль
+                    Console.WriteLine($"DEBUG: Income: {totalIncome}, Expenses: {totalExpenses}, Balance: {totalBalance}");
+                    Console.WriteLine($"DEBUG: Transaction count: {allTransactions.Count}");
                 });
             }
             catch (Exception ex)

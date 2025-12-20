@@ -11,6 +11,6 @@ namespace WpfApp1.Repositories
         Task<IEnumerable<Transaction>> GetByCategoryAsync(string category);
         Task<decimal> GetTotalIncomeAsync(int userId);
         Task<decimal> GetTotalExpensesAsync(int userId);
-        event EventHandler DataChanged;
+        event EventHandler DataChanged;  // Убедитесь, что это есть
     }
 }

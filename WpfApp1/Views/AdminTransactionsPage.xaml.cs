@@ -33,12 +33,12 @@ namespace WpfApp1.Views
             InitializeComponent();
             _userRepository = userRepository;
             _transactionRepository = transactionRepository;
+            _isInitialized = true;
 
             Loaded += async (s, e) =>
             {
                 await LoadUsersAsync();
                 await LoadTransactionsAsync();
-                _isInitialized = true;
             };
         }
 
@@ -73,8 +73,6 @@ namespace WpfApp1.Views
                 var transactions = await _transactionRepository.GetAllAsync();
                 _allTransactions = transactions?.ToList() ?? new List<Transaction>();
 
-                // Ожидаем инициализации элементов управления
-                await System.Threading.Tasks.Task.Delay(100);
                 UpdateTransactionsView();
             }
             catch (Exception ex)
@@ -86,6 +84,9 @@ namespace WpfApp1.Views
 
         private void UpdateTransactionsView()
         {
+            // Проверяем, инициализирован ли UI
+            if (!_isInitialized || TransactionsGrid == null) return;
+
             if (_allTransactions == null || _allUsers == null) return;
 
             var userDict = _allUsers.ToDictionary(u => u.UserId, u => u.Username);
@@ -131,8 +132,21 @@ namespace WpfApp1.Views
                 }
             }
 
-            TransactionsGrid.ItemsSource = transactionsView;
+            // Используем Dispatcher для обновления UI из другого потока
+            Dispatcher.Invoke(() =>
+            {
+                try
+                {
+                    TransactionsGrid.ItemsSource = transactionsView;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка обновления таблицы: {ex.Message}", "Ошибка",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            });
         }
+
         private async void AddTransactionBtn_Click(object sender, RoutedEventArgs e)
         {
             if (!_allUsers.Any())
@@ -251,7 +265,6 @@ namespace WpfApp1.Views
 
         private void UserFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!IsLoaded) return;
             UpdateTransactionsView();
         }
     }

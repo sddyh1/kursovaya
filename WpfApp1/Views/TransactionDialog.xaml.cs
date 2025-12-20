@@ -27,10 +27,11 @@ namespace WpfApp1.Views
             DescTextBox.Text = transaction.Description;
             AmountTextBox.Text = Math.Abs(transaction.Amount).ToString("F2");
 
-            // Устанавливаем тип
+            // Устанавливаем тип с учетом, что в базе "Income"/"Expense", а в интерфейсе "Доход"/"Расход"
+            string typeForComboBox = transaction.Type == "Income" ? "Доход" : "Расход";
             foreach (ComboBoxItem item in TypeComboBox.Items)
             {
-                if (item.Content.ToString() == transaction.Type)
+                if (item.Content.ToString() == typeForComboBox)
                 {
                     TypeComboBox.SelectedItem = item;
                     break;
@@ -94,9 +95,15 @@ namespace WpfApp1.Views
             // Объединяем дату и время
             TransactionDate = DatePicker.SelectedDate.Value.Date + time.TimeOfDay;
 
-            Type = (TypeComboBox.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Доход";
+            // Конвертируем тип из интерфейса в формат базы данных
+            string selectedType = (TypeComboBox.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Доход";
+            Type = selectedType == "Доход" ? "Income" : "Expense";
+
             Category = (CategoryComboBox.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Еда";
-            Amount = Type == "Расход" ? -amount : amount;
+
+            // Устанавливаем сумму с учетом типа
+            // Для доходов - положительное значение, для расходов - отрицательное
+            Amount = Type == "Expense" ? -Math.Abs(amount) : Math.Abs(amount);
 
             DialogResult = true;
         }
@@ -120,7 +127,7 @@ namespace WpfApp1.Views
 
         private void TimeTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-
+            // Обработка изменений текста времени
         }
     }
 }
