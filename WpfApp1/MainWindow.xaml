@@ -7,7 +7,6 @@
     <Border CornerRadius="15" Margin="15" Background="White"
             BorderThickness="1" BorderBrush="#E0E0E0">
         <Grid>
-            <!-- Декоративные элементы -->
             <Grid IsHitTestVisible="False">
                 <Ellipse Width="80" Height="80" 
                          Fill="#E8CBAA" Opacity="0.05"
@@ -57,7 +56,6 @@
                          VerticalAlignment="Bottom"
                          Margin="0,0,0,100"/>
 
-                <!-- Треугольники -->
                 <Polygon Points="50,0 100,100 0,100" 
                          Fill="#E8CBAA" Opacity="0.02"
                          HorizontalAlignment="Left"
@@ -70,7 +68,6 @@
                          VerticalAlignment="Bottom"
                          Margin="0,0,300,150"/>
 
-                <!-- Квадраты -->
                 <Rectangle Width="45" Height="45"
                            Fill="#BC6C25" Opacity="0.02"
                            HorizontalAlignment="Center"
@@ -84,7 +81,6 @@
                            Margin="0,0,250,0"/>
             </Grid>
 
-            <!-- Основной контент -->
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -93,7 +89,6 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Верхняя панель с заголовком и кнопкой выхода -->
                 <Border Grid.Row="0" Background="#F9F9F9" CornerRadius="10" Margin="10">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -174,7 +169,6 @@
                     </Grid>
                 </Border>
 
-                <!-- Панель управления -->
                 <Border Grid.Row="1" Background="#F9F9F9" CornerRadius="10" Margin="10,10,10,5">
                     <StackPanel Orientation="Horizontal" Margin="10">
                         <Button x:Name="AddBtn" Content="➕ ДОБАВИТЬ" Click="AddBtn_Click" 
@@ -341,7 +335,6 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Таблица транзакций -->
                 <Border Grid.Row="2" CornerRadius="10" BorderThickness="1" BorderBrush="#E0E0E0" Margin="10">
                     <DataGrid x:Name="TransactionsGrid" 
                               AutoGenerateColumns="False" IsReadOnly="True"
@@ -357,7 +350,6 @@
                               SelectionUnit="FullRow">
 
                         <DataGrid.Resources>
-                            <!-- Убираем стандартный синий цвет выделения -->
                             <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" 
                                              Color="#E8CBAA" Opacity="0.7"/>
                             <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" 
@@ -497,7 +489,6 @@
                     </DataGrid>
                 </Border>
 
-                <!-- Панель статистики -->
                 <Border Grid.Row="3" Background="#F9F9F9" CornerRadius="10" Margin="10,5,10,10">
                     <StackPanel Orientation="Horizontal" Margin="15">
                         <Border Background="White" CornerRadius="8" Padding="15" Margin="0,0,15,0"

@@ -32,7 +32,6 @@ namespace WpfApp1.Views
             DescTextBox.Text = transaction.Description;
             AmountTextBox.Text = Math.Abs(transaction.Amount).ToString("F2");
 
-            // Устанавливаем тип с учетом, что в базе "Income"/"Expense", а в интерфейсе "Доход"/"Расход"
             string typeForComboBox = transaction.Type == "Income" ? "Доход" : "Расход";
             foreach (System.Windows.Controls.ComboBoxItem item in TypeComboBox.Items)
             {
@@ -43,7 +42,6 @@ namespace WpfApp1.Views
                 }
             }
 
-            // Устанавливаем категорию
             foreach (System.Windows.Controls.ComboBoxItem item in CategoryComboBox.Items)
             {
                 if (item.Content.ToString() == transaction.CategoryName)
@@ -110,7 +108,6 @@ namespace WpfApp1.Views
 
             Category = (CategoryComboBox.SelectedItem as System.Windows.Controls.ComboBoxItem)?.Content.ToString() ?? "Еда";
 
-            // Устанавливаем сумму с учетом типа
             // Для доходов - положительное значение, для расходов - отрицательное
             Amount = Type == "Expense" ? -Math.Abs(amount) : Math.Abs(amount);
 

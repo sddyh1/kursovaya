@@ -28,16 +28,13 @@ namespace WpfApp1
             _currentUser = user;
             _transactionRepository = new TransactionRepository("Data Source=finance.db;Version=3;");
 
-            // Подписываемся на событие изменения данных
             _transactionRepository.DataChanged += async (s, e) => await LoadTransactionsAsync();
 
             InitializeUI();
 
 
-            // Добавляем обработчик для снятия выделения при повторном клике
             TransactionsGrid.PreviewMouseDown += TransactionsGrid_PreviewMouseDown;
 
-            // Используем discard для асинхронного вызова
             _ = LoadTransactionsAsync();
         }
 
@@ -82,13 +79,11 @@ namespace WpfApp1
             ExpenseText.Text = $"Расходы: {Math.Abs(totalExpenses):N2} ₽";
         }
 
-        // Обработчик для снятия выделения при повторном клике на строку
         private void TransactionsGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             var dataGrid = sender as DataGrid;
             if (dataGrid == null) return;
 
-            // Получаем элемент под курсором
             var hitTestResult = VisualTreeHelper.HitTest(dataGrid, e.GetPosition(dataGrid));
 
             if (hitTestResult != null)
@@ -96,17 +91,15 @@ namespace WpfApp1
                 var row = FindParent<DataGridRow>(hitTestResult.VisualHit);
                 if (row != null)
                 {
-                    // Если строка уже выделена, снимаем выделение
                     if (row.IsSelected)
                     {
                         row.IsSelected = false;
-                        e.Handled = true; // Предотвращаем дальнейшую обработку
+                        e.Handled = true;
                     }
                 }
             }
         }
 
-        // Вспомогательный метод для поиска родительского элемента
         private T FindParent<T>(DependencyObject child) where T : DependencyObject
         {
             DependencyObject parentObject = VisualTreeHelper.GetParent(child);
@@ -241,18 +234,15 @@ namespace WpfApp1
 
             if (result == MessageBoxResult.Yes)
             {
-                // Открываем окно входа
                 var loginWindow = new LoginWindow();
                 loginWindow.Show();
 
-                // Закрываем текущее окно
                 this.Close();
             }
         }
 
         protected override void OnClosed(EventArgs e)
         {
-            // Отписываемся от событий при закрытии окна
             if (_transactionRepository != null)
             {
                 _transactionRepository.DataChanged -= async (s, ev) => await LoadTransactionsAsync();
