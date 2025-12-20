@@ -1,67 +1,534 @@
 ﻿<Window x:Class="WpfApp1.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Finance Manager" Height="600" Width="900"
-        WindowStartupLocation="CenterScreen">
+        Title="Finance Manager" Height="700" Width="1000"
+        Background="#F5F5F5">
 
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Border CornerRadius="15" Margin="15" Background="White"
+            BorderThickness="1" BorderBrush="#E0E0E0">
+        <Grid>
+            <!-- Декоративные элементы -->
+            <Grid IsHitTestVisible="False">
+                <Ellipse Width="80" Height="80" 
+                         Fill="#E8CBAA" Opacity="0.05"
+                         HorizontalAlignment="Left"
+                         VerticalAlignment="Top"
+                         Margin="30,100,0,0"/>
 
-        <!-- Панель управления -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <Button x:Name="AddBtn" Content="➕ Добавить" Click="AddBtn_Click" Padding="10,5" Margin="5"/>
-            <Button x:Name="EditBtn" Content="✏️ Редактировать" Click="EditBtn_Click" Padding="10,5" Margin="5"/>
-            <Button x:Name="DeleteBtn" Content="❌ Удалить" Click="DeleteBtn_Click" Padding="10,5" Margin="5"/>
-            <Button x:Name="RefreshBtn" Content="🔄 Обновить" Click="RefreshBtn_Click" Padding="10,5" Margin="5"/>
-            <Button x:Name="LogoutButton" Content="Выйти" Click="LogoutButton_Click" 
-                    Padding="10,5" Margin="5" Width="80"/>
-        </StackPanel>
+                <Ellipse Width="60" Height="60" 
+                         Fill="#606C38" Opacity="0.03"
+                         HorizontalAlignment="Right"
+                         VerticalAlignment="Bottom"
+                         Margin="0,0,40,40"/>
 
-        <!-- Панель пользователя и поиск -->
-        <Grid Grid.Row="1" Margin="0,10,0,5">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+                <Ellipse Width="40" Height="40"
+                         Fill="#BC6C25" Opacity="0.04"
+                         HorizontalAlignment="Left"
+                         VerticalAlignment="Bottom"
+                         Margin="50,0,0,80"/>
 
-            <!-- Поиск -->
-            <StackPanel Grid.Column="0" Orientation="Horizontal">
-                <TextBlock Text="Поиск:" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <TextBox x:Name="SearchTextBox" Width="200" Height="25" 
-                         TextChanged="SearchTextBox_TextChanged"/>
-            </StackPanel>
+                <Ellipse Width="70" Height="70"
+                         Fill="#4ECDC4" Opacity="0.03"
+                         HorizontalAlignment="Right"
+                         VerticalAlignment="Top"
+                         Margin="0,150,60,0"/>
 
-            <!-- Информация о пользователе -->
-            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock Text="Пользователь:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                <TextBlock x:Name="CurrentUserText" FontWeight="Bold" VerticalAlignment="Center"/>
-            </StackPanel>
+                <Ellipse Width="55" Height="55"
+                         Fill="#FF6B6B" Opacity="0.03"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Top"
+                         Margin="0,50,0,0"/>
+
+                <Ellipse Width="45" Height="45"
+                         Fill="#E8CBAA" Opacity="0.04"
+                         HorizontalAlignment="Right"
+                         VerticalAlignment="Center"
+                         Margin="0,0,100,0"/>
+
+                <Ellipse Width="35" Height="35"
+                         Fill="#606C38" Opacity="0.03"
+                         HorizontalAlignment="Left"
+                         VerticalAlignment="Center"
+                         Margin="100,0,0,0"/>
+
+                <Ellipse Width="65" Height="65"
+                         Fill="#4CAF50" Opacity="0.03"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Bottom"
+                         Margin="0,0,0,100"/>
+
+                <!-- Треугольники -->
+                <Polygon Points="50,0 100,100 0,100" 
+                         Fill="#E8CBAA" Opacity="0.02"
+                         HorizontalAlignment="Left"
+                         VerticalAlignment="Top"
+                         Margin="400,50,0,0"/>
+
+                <Polygon Points="0,0 100,0 50,100"
+                         Fill="#606C38" Opacity="0.02"
+                         HorizontalAlignment="Right"
+                         VerticalAlignment="Bottom"
+                         Margin="0,0,300,150"/>
+
+                <!-- Квадраты -->
+                <Rectangle Width="45" Height="45"
+                           Fill="#BC6C25" Opacity="0.02"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Top"
+                           Margin="200,200,0,0"/>
+
+                <Rectangle Width="30" Height="30"
+                           Fill="#4ECDC4" Opacity="0.02"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Margin="0,0,250,0"/>
+            </Grid>
+
+            <!-- Основной контент -->
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Верхняя панель с заголовком и кнопкой выхода -->
+                <Border Grid.Row="0" Background="#F9F9F9" CornerRadius="10" Margin="10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="15">
+                            <TextBlock Text="💰 " FontSize="24" VerticalAlignment="Center"/>
+                            <StackPanel>
+                                <TextBlock Text="ФИНАНСОВЫЙ МЕНЕДЖЕР" 
+                                           FontSize="18" 
+                                           FontWeight="Bold"
+                                           Foreground="#606C38"/>
+                                <TextBlock x:Name="CurrentUserText" 
+                                           FontSize="12"
+                                           Foreground="#888888"
+                                           Text="Пользователь: "/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <Button Grid.Column="1" 
+                                x:Name="LogoutButton" 
+                                Content="ВЫЙТИ" 
+                                Click="LogoutButton_Click"
+                                Background="#BC6C25"
+                                Foreground="#FFFFFF"
+                                BorderBrush="#BC6C25"
+                                Width="100"
+                                Height="35"
+                                FontSize="13"
+                                FontWeight="SemiBold"
+                                Margin="0,0,15,0"
+                                Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="border" 
+                                                        CornerRadius="8"
+                                                        Background="{TemplateBinding Background}"
+                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                        BorderThickness="1">
+                                                    <ContentPresenter HorizontalAlignment="Center" 
+                                                                    VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="#9A5520"/>
+                                                        <Setter Property="BorderBrush" Value="#9A5520"/>
+                                                        <Setter TargetName="border" Property="RenderTransform">
+                                                            <Setter.Value>
+                                                                <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Trigger>
+                                                    <Trigger Property="IsPressed" Value="True">
+                                                        <Setter Property="Background" Value="#7A441B"/>
+                                                        <Setter Property="BorderBrush" Value="#7A441B"/>
+                                                        <Setter TargetName="border" Property="RenderTransform">
+                                                            <Setter.Value>
+                                                                <ScaleTransform ScaleX="0.98" ScaleY="0.98"/>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                            <Button.RenderTransform>
+                                <ScaleTransform ScaleX="1" ScaleY="1"/>
+                            </Button.RenderTransform>
+                            <Button.RenderTransformOrigin>0.5,0.5</Button.RenderTransformOrigin>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!-- Панель управления -->
+                <Border Grid.Row="1" Background="#F9F9F9" CornerRadius="10" Margin="10,10,10,5">
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <Button x:Name="AddBtn" Content="➕ ДОБАВИТЬ" Click="AddBtn_Click" 
+                                Background="#606C38" Foreground="White" BorderBrush="#606C38"
+                                Width="120" Height="35" FontSize="13" FontWeight="SemiBold"
+                                Margin="5" Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="border" 
+                                                        CornerRadius="8"
+                                                        Background="{TemplateBinding Background}"
+                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                        BorderThickness="1">
+                                                    <ContentPresenter HorizontalAlignment="Center" 
+                                                                    VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="#4A582C"/>
+                                                        <Setter Property="BorderBrush" Value="#4A582C"/>
+                                                        <Setter TargetName="border" Property="RenderTransform">
+                                                            <Setter.Value>
+                                                                <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Trigger>
+                                                    <Trigger Property="IsPressed" Value="True">
+                                                        <Setter Property="Background" Value="#3A4724"/>
+                                                        <Setter Property="BorderBrush" Value="#3A4724"/>
+                                                        <Setter TargetName="border" Property="RenderTransform">
+                                                            <Setter.Value>
+                                                                <ScaleTransform ScaleX="0.98" ScaleY="0.98"/>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+
+                        <Button x:Name="EditBtn" Content="✏️ РЕДАКТИРОВАТЬ" Click="EditBtn_Click" 
+                                Background="#E8CBAA" Foreground="#333333" BorderBrush="#E8CBAA"
+                                Width="140" Height="35" FontSize="13" FontWeight="SemiBold"
+                                Margin="5" Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="border" 
+                                                        CornerRadius="8"
+                                                        Background="{TemplateBinding Background}"
+                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                        BorderThickness="1">
+                                                    <ContentPresenter HorizontalAlignment="Center" 
+                                                                    VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="#D4B88E"/>
+                                                        <Setter Property="BorderBrush" Value="#D4B88E"/>
+                                                        <Setter TargetName="border" Property="RenderTransform">
+                                                            <Setter.Value>
+                                                                <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+
+                        <Button x:Name="DeleteBtn" Content="❌ УДАЛИТЬ" Click="DeleteBtn_Click" 
+                                Background="#FF6B6B" Foreground="White" BorderBrush="#FF6B6B"
+                                Width="110" Height="35" FontSize="13" FontWeight="SemiBold"
+                                Margin="5" Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="border" 
+                                                        CornerRadius="8"
+                                                        Background="{TemplateBinding Background}"
+                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                        BorderThickness="1">
+                                                    <ContentPresenter HorizontalAlignment="Center" 
+                                                                    VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="#E05555"/>
+                                                        <Setter Property="BorderBrush" Value="#E05555"/>
+                                                        <Setter TargetName="border" Property="RenderTransform">
+                                                            <Setter.Value>
+                                                                <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+
+                        <Button x:Name="RefreshBtn" Content="🔄 ОБНОВИТЬ" Click="RefreshBtn_Click" 
+                                Background="#4ECDC4" Foreground="White" BorderBrush="#4ECDC4"
+                                Width="110" Height="35" FontSize="13" FontWeight="SemiBold"
+                                Margin="5" Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="border" 
+                                                        CornerRadius="8"
+                                                        Background="{TemplateBinding Background}"
+                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                        BorderThickness="1">
+                                                    <ContentPresenter HorizontalAlignment="Center" 
+                                                                    VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="#3DA9A1"/>
+                                                        <Setter Property="BorderBrush" Value="#3DA9A1"/>
+                                                        <Setter TargetName="border" Property="RenderTransform">
+                                                            <Setter.Value>
+                                                                <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+
+                        <Border CornerRadius="8" Background="#F0F0F0" Margin="10,0,0,0" Padding="10,0" Width="389">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="🔍" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                <TextBox x:Name="SearchTextBox" 
+                                         Width="347" Height="30" 
+                                         Padding="8" FontSize="13"
+                                         BorderThickness="1" BorderBrush="#E8CBAA"
+                                         Background="White"
+                                         TextChanged="SearchTextBox_TextChanged"
+                                         VerticalContentAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- Таблица транзакций -->
+                <Border Grid.Row="2" CornerRadius="10" BorderThickness="1" BorderBrush="#E0E0E0" Margin="10">
+                    <DataGrid x:Name="TransactionsGrid" 
+                              AutoGenerateColumns="False" IsReadOnly="True"
+                              SelectionMode="Single"
+                              Background="White"
+                              BorderThickness="0"
+                              GridLinesVisibility="None"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              CanUserReorderColumns="False"
+                              CanUserResizeRows="False"
+                              CanUserSortColumns="True"
+                              SelectionUnit="FullRow">
+
+                        <DataGrid.Resources>
+                            <!-- Убираем стандартный синий цвет выделения -->
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" 
+                                             Color="#E8CBAA" Opacity="0.7"/>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" 
+                                             Color="#333333"/>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" 
+                                             Color="#F0F0F0"/>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" 
+                                             Color="#333333"/>
+                        </DataGrid.Resources>
+
+                        <DataGrid.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                                <Setter Property="Padding" Value="12,10"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="DataGridCell">
+                                            <Grid Background="{TemplateBinding Background}">
+                                                <ContentPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                                                <Border BorderBrush="{TemplateBinding BorderBrush}" 
+                                                        BorderThickness="{TemplateBinding BorderThickness}"/>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DataGrid.CellStyle>
+
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#F0F0F0"/>
+                                <Setter Property="Foreground" Value="#606C38"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="FontSize" Value="13"/>
+                                <Setter Property="Height" Value="40"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                <Setter Property="BorderBrush" Value="#E8CBAA"/>
+                                <Setter Property="Padding" Value="12,0"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Setter Property="MinHeight" Value="45"/>
+                                <Setter Property="Background" Value="#FFFFFF"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#F9F9F9"/>
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="#E8CBAA"/>
+                                        <Setter Property="Foreground" Value="#333333"/>
+                                    </Trigger>
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="AlternationIndex" Value="1"/>
+                                            <Condition Property="IsSelected" Value="False"/>
+                                            <Condition Property="IsMouseOver" Value="False"/>
+                                        </MultiTrigger.Conditions>
+                                        <Setter Property="Background" Value="#F9F9F9"/>
+                                    </MultiTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Binding="{Binding TransactionId}" Width="70">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="HorizontalAlignment" Value="Left"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Padding" Value="12,0,0,0"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="ОПИСАНИЕ" Binding="{Binding Description}" Width="250">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="HorizontalAlignment" Value="Left"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Padding" Value="12,0,0,0"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="СУММА" Binding="{Binding Amount, StringFormat='{}{0:N2} ₽'}" Width="130">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="HorizontalAlignment" Value="Left"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Padding" Value="12,0,0,0"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Type}" Value="Income">
+                                                <Setter Property="Foreground" Value="#4CAF50"/>
+                                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Type}" Value="Expense">
+                                                <Setter Property="Foreground" Value="#F44336"/>
+                                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="ТИП" Binding="{Binding Type}" Width="110">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="HorizontalAlignment" Value="Left"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Padding" Value="12,0,0,0"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="КАТЕГОРИЯ" Binding="{Binding CategoryName}" Width="140">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="HorizontalAlignment" Value="Left"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Padding" Value="12,0,0,0"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="ДАТА" Binding="{Binding TransactionDate, StringFormat='dd.MM.yyyy HH:mm'}" Width="160">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="HorizontalAlignment" Value="Left"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Padding" Value="12,0,0,0"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+
+                <!-- Панель статистики -->
+                <Border Grid.Row="3" Background="#F9F9F9" CornerRadius="10" Margin="10,5,10,10">
+                    <StackPanel Orientation="Horizontal" Margin="15">
+                        <Border Background="White" CornerRadius="8" Padding="15" Margin="0,0,15,0"
+                                BorderThickness="1" BorderBrush="#E0E0E0">
+                            <TextBlock x:Name="StatsText" 
+                                       Text="Баланс: 0,00 ₽"
+                                       FontSize="16" 
+                                       FontWeight="Bold"
+                                       Foreground="#606C38"/>
+                        </Border>
+
+                        <Border Background="White" CornerRadius="8" Padding="15" Margin="0,0,15,0"
+                                BorderThickness="1" BorderBrush="#E0E0E0">
+                            <TextBlock x:Name="IncomeText" 
+                                       Text="Доходы: 0,00 ₽"
+                                       FontSize="14" 
+                                       FontWeight="SemiBold"
+                                       Foreground="#4CAF50"/>
+                        </Border>
+
+                        <Border Background="White" CornerRadius="8" Padding="15"
+                                BorderThickness="1" BorderBrush="#E0E0E0">
+                            <TextBlock x:Name="ExpenseText" 
+                                       Text="Расходы: 0,00 ₽"
+                                       FontSize="14" 
+                                       FontWeight="SemiBold"
+                                       Foreground="#F44336"/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </Grid>
         </Grid>
-
-        <!-- Таблица транзакций -->
-        <DataGrid x:Name="TransactionsGrid" Grid.Row="2" Margin="0,10" 
-                  AutoGenerateColumns="False" IsReadOnly="True"
-                  SelectionMode="Single">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="ID" Binding="{Binding TransactionId}" Width="50"/>
-                <DataGridTextColumn Header="Описание" Binding="{Binding Description}" Width="200"/>
-                <DataGridTextColumn Header="Сумма" Binding="{Binding Amount, StringFormat='{}{0:N2} ₽'}" Width="100"/>
-                <DataGridTextColumn Header="Тип" Binding="{Binding Type}" Width="100"/>
-                <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="120"/>
-                <DataGridTextColumn Header="Дата" Binding="{Binding TransactionDate, StringFormat='dd.MM.yyyy HH:mm'}" Width="120"/>
-            </DataGrid.Columns>
-        </DataGrid>
-
-        <!-- Статистика -->
-        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,10,0,0">
-            <TextBlock x:Name="StatsText" FontWeight="Bold" Margin="0,0,20,0"/>
-            <TextBlock x:Name="IncomeText" Foreground="Green" Margin="0,0,20,0"/>
-            <TextBlock x:Name="ExpenseText" Foreground="Red" Margin="0,0,20,0"/>
-        </StackPanel>
-    </Grid>
+    </Border>
 </Window>

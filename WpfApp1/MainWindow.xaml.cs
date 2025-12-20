@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 using WpfApp1.Models;
 using WpfApp1.Repositories;
 using WpfApp1.Views;
@@ -13,10 +15,15 @@ namespace WpfApp1
     {
         private readonly ITransactionRepository _transactionRepository;
         private readonly User _currentUser;
-        private List<Transaction> _allTransactions;
+        private List<Transaction> _allTransactions = new List<Transaction>();
 
         public MainWindow(User user)
         {
+            if (user is null)
+            {
+                throw new ArgumentNullException(nameof(user), "User cannot be null");
+            }
+
             InitializeComponent();
             _currentUser = user;
             _transactionRepository = new TransactionRepository("Data Source=finance.db;Version=3;");
@@ -25,7 +32,13 @@ namespace WpfApp1
             _transactionRepository.DataChanged += async (s, e) => await LoadTransactionsAsync();
 
             InitializeUI();
-            LoadTransactionsAsync();
+
+
+            // Добавляем обработчик для снятия выделения при повторном клике
+            TransactionsGrid.PreviewMouseDown += TransactionsGrid_PreviewMouseDown;
+
+            // Используем discard для асинхронного вызова
+            _ = LoadTransactionsAsync();
         }
 
         private void InitializeUI()
@@ -38,7 +51,8 @@ namespace WpfApp1
         {
             try
             {
-                _allTransactions = (await _transactionRepository.GetByUserIdAsync(_currentUser.UserId)).ToList();
+                var transactions = await _transactionRepository.GetByUserIdAsync(_currentUser.UserId);
+                _allTransactions = transactions?.ToList() ?? new List<Transaction>();
                 TransactionsGrid.ItemsSource = _allTransactions;
                 UpdateStatistics();
             }
@@ -51,15 +65,58 @@ namespace WpfApp1
 
         private void UpdateStatistics()
         {
-            if (_allTransactions == null) return;
+            if (_allTransactions == null || !_allTransactions.Any())
+            {
+                StatsText.Text = "Баланс: 0,00 ₽";
+                IncomeText.Text = "Доходы: 0,00 ₽";
+                ExpenseText.Text = "Расходы: 0,00 ₽";
+                return;
+            }
 
             var totalIncome = _allTransactions.Where(t => t.Type == "Income").Sum(t => t.Amount);
             var totalExpenses = _allTransactions.Where(t => t.Type == "Expense").Sum(t => t.Amount);
-            var balance = totalIncome + totalExpenses; // Expenses уже отрицательные
+            var balance = totalIncome + totalExpenses;
 
             StatsText.Text = $"Баланс: {balance:N2} ₽";
             IncomeText.Text = $"Доходы: {totalIncome:N2} ₽";
             ExpenseText.Text = $"Расходы: {Math.Abs(totalExpenses):N2} ₽";
+        }
+
+        // Обработчик для снятия выделения при повторном клике на строку
+        private void TransactionsGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var dataGrid = sender as DataGrid;
+            if (dataGrid == null) return;
+
+            // Получаем элемент под курсором
+            var hitTestResult = VisualTreeHelper.HitTest(dataGrid, e.GetPosition(dataGrid));
+
+            if (hitTestResult != null)
+            {
+                var row = FindParent<DataGridRow>(hitTestResult.VisualHit);
+                if (row != null)
+                {
+                    // Если строка уже выделена, снимаем выделение
+                    if (row.IsSelected)
+                    {
+                        row.IsSelected = false;
+                        e.Handled = true; // Предотвращаем дальнейшую обработку
+                    }
+                }
+            }
+        }
+
+        // Вспомогательный метод для поиска родительского элемента
+        private T FindParent<T>(DependencyObject child) where T : DependencyObject
+        {
+            DependencyObject parentObject = VisualTreeHelper.GetParent(child);
+
+            if (parentObject == null) return null;
+
+            if (parentObject is T parent)
+                return parent;
+            else
+                return FindParent<T>(parentObject);
         }
 
         private async void AddBtn_Click(object sender, RoutedEventArgs e)
@@ -80,7 +137,6 @@ namespace WpfApp1
                 try
                 {
                     await _transactionRepository.AddAsync(transaction);
-                    // Данные автоматически обновятся благодаря событию DataChanged
                 }
                 catch (Exception ex)
                 {
@@ -89,6 +145,8 @@ namespace WpfApp1
                 }
             }
         }
+
+
 
         private async void EditBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -199,6 +257,12 @@ namespace WpfApp1
             {
                 _transactionRepository.DataChanged -= async (s, ev) => await LoadTransactionsAsync();
             }
+
+            if (TransactionsGrid != null)
+            {
+                TransactionsGrid.PreviewMouseDown -= TransactionsGrid_PreviewMouseDown;
+            }
+
             base.OnClosed(e);
         }
     }

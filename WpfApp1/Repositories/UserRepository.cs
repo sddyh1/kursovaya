@@ -9,6 +9,7 @@ namespace WpfApp1.Repositories
     public class UserRepository : IUserRepository
     {
         private readonly string _connectionString;
+        public event EventHandler? DataChanged; // Реализуем событие
 
         public UserRepository(string connectionString)
         {
@@ -120,6 +121,7 @@ namespace WpfApp1.Repositories
                 command.Parameters.AddWithValue("@isActive", user.IsActive);
 
                 await command.ExecuteNonQueryAsync();
+                OnDataChanged(); // Уведомляем об изменении
             }
         }
 
@@ -142,6 +144,7 @@ namespace WpfApp1.Repositories
                 command.Parameters.AddWithValue("@id", user.UserId);
 
                 await command.ExecuteNonQueryAsync();
+                OnDataChanged(); // Уведомляем об изменении
             }
         }
 
@@ -154,6 +157,7 @@ namespace WpfApp1.Repositories
                 command.Parameters.AddWithValue("@id", id);
 
                 await command.ExecuteNonQueryAsync();
+                OnDataChanged(); // Уведомляем об изменении
             }
         }
 
@@ -190,6 +194,11 @@ namespace WpfApp1.Repositories
                 var result = await command.ExecuteScalarAsync();
                 return Convert.ToInt32(result) > 0;
             }
+        }
+
+        protected virtual void OnDataChanged()
+        {
+            DataChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }

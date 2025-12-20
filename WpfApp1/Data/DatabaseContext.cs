@@ -57,11 +57,13 @@ namespace WpfApp1.Data
 
                     if (databaseCreated)
                     {
+                        // Добавляем администратора по умолчанию
                         command.CommandText = @"
                             INSERT INTO Users (Username, PasswordHash, Email, Role, CreatedAt, IsActive)
                             VALUES ('admin', 'admin123', 'admin@finance.com', 'Admin', datetime('now'), 1)";
                         command.ExecuteNonQuery();
 
+                        // Добавляем тестовые транзакции для администратора
                         command.CommandText = @"
                             INSERT INTO Transactions (Description, Amount, Type, CategoryName, TransactionDate, UserId)
                             VALUES 
@@ -69,6 +71,22 @@ namespace WpfApp1.Data
                             ('Продукты', -3500.50, 'Expense', 'Food', datetime('now', '-6 days'), 1),
                             ('Коммунальные услуги', -2500.00, 'Expense', 'Utilities', datetime('now', '-5 days'), 1),
                             ('Фриланс', 15000.00, 'Income', 'Freelance', datetime('now', '-4 days'), 1)";
+                        command.ExecuteNonQuery();
+
+                        // Добавляем тестового обычного пользователя
+                        command.CommandText = @"
+                            INSERT INTO Users (Username, PasswordHash, Email, Role, CreatedAt, IsActive)
+                            VALUES ('user', 'user123', 'user@finance.com', 'User', datetime('now'), 1)";
+                        command.ExecuteNonQuery();
+
+                        // Добавляем тестовые транзакции для обычного пользователя
+                        command.CommandText = @"
+                            INSERT INTO Transactions (Description, Amount, Type, CategoryName, TransactionDate, UserId)
+                            VALUES 
+                            ('Зарплата', 30000.00, 'Income', 'Salary', datetime('now', '-3 days'), 2),
+                            ('Обед в кафе', -800.00, 'Expense', 'Food', datetime('now', '-2 days'), 2),
+                            ('Бензин', -1500.00, 'Expense', 'Transport', datetime('now', '-1 days'), 2),
+                            ('Подработка', 5000.00, 'Income', 'Freelance', datetime('now'), 2)";
                         command.ExecuteNonQuery();
                     }
                 }

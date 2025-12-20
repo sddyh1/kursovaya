@@ -1,34 +1,39 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
 using WpfApp1.Models;
 
 namespace WpfApp1.Views
 {
-    public partial class TransactionDialog : Window
+    public partial class AdminTransactionDialog : Window
     {
         public string Description { get; private set; } = string.Empty;
         public decimal Amount { get; private set; }
         public string Type { get; private set; } = string.Empty;
         public string Category { get; private set; } = string.Empty;
         public DateTime TransactionDate { get; private set; }
+        public int SelectedUserId { get; private set; }
 
-        public TransactionDialog()
+        public AdminTransactionDialog(List<User> users)
         {
             InitializeComponent();
+            UserComboBox.ItemsSource = users;
             DatePicker.SelectedDate = DateTime.Today;
             TimeTextBox.Text = DateTime.Now.ToString("HH:mm");
+
+            if (users.Any())
+                UserComboBox.SelectedIndex = 0;
         }
 
-        public TransactionDialog(Transaction transaction) : this()
+        public AdminTransactionDialog(List<User> users, Transaction transaction) : this(users)
         {
             Title = "Редактировать транзакцию";
             DescTextBox.Text = transaction.Description;
             AmountTextBox.Text = Math.Abs(transaction.Amount).ToString("F2");
 
             // Устанавливаем тип
-            foreach (ComboBoxItem item in TypeComboBox.Items)
+            foreach (System.Windows.Controls.ComboBoxItem item in TypeComboBox.Items)
             {
                 if (item.Content.ToString() == transaction.Type)
                 {
@@ -38,7 +43,7 @@ namespace WpfApp1.Views
             }
 
             // Устанавливаем категорию
-            foreach (ComboBoxItem item in CategoryComboBox.Items)
+            foreach (System.Windows.Controls.ComboBoxItem item in CategoryComboBox.Items)
             {
                 if (item.Content.ToString() == transaction.CategoryName)
                 {
@@ -49,12 +54,19 @@ namespace WpfApp1.Views
 
             DatePicker.SelectedDate = transaction.TransactionDate;
             TimeTextBox.Text = transaction.TransactionDate.ToString("HH:mm");
+            UserComboBox.SelectedValue = transaction.UserId;
         }
 
-        private void OkBtn_Click(object sender, RoutedEventArgs e)
+        private void OkButton_Click(object sender, RoutedEventArgs e)
         {
-            Description = DescTextBox.Text;
+            if (UserComboBox.SelectedItem == null)
+            {
+                MessageBox.Show("Выберите пользователя", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
+            Description = DescTextBox.Text;
             if (string.IsNullOrWhiteSpace(Description))
             {
                 MessageBox.Show("Введите описание транзакции", "Ошибка",
@@ -72,7 +84,6 @@ namespace WpfApp1.Views
                 return;
             }
 
-            // Проверяем дату
             if (DatePicker.SelectedDate == null)
             {
                 MessageBox.Show("Выберите дату", "Ошибка",
@@ -81,7 +92,6 @@ namespace WpfApp1.Views
                 return;
             }
 
-            // Проверяем время
             if (!DateTime.TryParse(TimeTextBox.Text, out DateTime time))
             {
                 MessageBox.Show("Введите корректное время (формат: HH:mm)", "Ошибка",
@@ -91,36 +101,18 @@ namespace WpfApp1.Views
                 return;
             }
 
-            // Объединяем дату и время
             TransactionDate = DatePicker.SelectedDate.Value.Date + time.TimeOfDay;
-
-            Type = (TypeComboBox.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Доход";
-            Category = (CategoryComboBox.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Еда";
+            Type = (TypeComboBox.SelectedItem as System.Windows.Controls.ComboBoxItem)?.Content.ToString() ?? "Доход";
+            Category = (CategoryComboBox.SelectedItem as System.Windows.Controls.ComboBoxItem)?.Content.ToString() ?? "Еда";
             Amount = Type == "Расход" ? -amount : amount;
+            SelectedUserId = (int)UserComboBox.SelectedValue;
 
             DialogResult = true;
         }
 
-        private void CancelBtn_Click(object sender, RoutedEventArgs e)
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
-        }
-
-        // Блокировка колесика мыши для ComboBox
-        private void ComboBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            e.Handled = true;
-        }
-
-        // Блокировка колесика мыши для TextBox
-        private void TextBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            e.Handled = true;
-        }
-
-        private void TimeTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-
         }
     }
 }
